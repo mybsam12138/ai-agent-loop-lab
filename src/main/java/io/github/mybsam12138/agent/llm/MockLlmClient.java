@@ -11,18 +11,28 @@ public class MockLlmClient implements LlmClient {
 
     @Override
     public ToolCall decide(AgentState state) {
-        // stop condition
-        if (state.isFinished()) {
-            return new ToolCall("finish", Map.of());
+        // 1. First step: print something
+        if (state.memoryHistory().isEmpty() && state.getObservation().equals("start")) {
+            return new ToolCall(
+                    "print",
+                    Map.of("message", "Starting agent with goal: " + state.getGoal())
+            );
         }
 
-        // if we already printed once, finish
-        String obs = state.getObservation() == null ? "" : state.getObservation();
-        if (obs.startsWith("printed:")) {
-            return new ToolCall("finish", Map.of());
+        // 2. After printing, remember it
+        if (state.memoryHistory().isEmpty()) {
+            return new ToolCall(
+                    "remember",
+                    Map.of("text", state.getObservation())
+            );
         }
 
-        // otherwise print
-        return new ToolCall("print", Map.of("message", "Hello from Day 3 tool calling"));
+        // 3. Recall memory once
+        if (!state.getObservation().startsWith("memory")) {
+            return new ToolCall("recall", Map.of());
+        }
+
+        // 4. Finish
+        return new ToolCall("finish", Map.of());
     }
 }

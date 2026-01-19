@@ -29,6 +29,7 @@ public class AgentLoop {
 
             // optional extra debug
             System.out.println("ToolResultObservation: " + toolResultObservation);
+            System.out.println("Memory: " + state.memoryHistory());
             System.out.println("----");
         }
     }
