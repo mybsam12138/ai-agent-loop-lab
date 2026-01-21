@@ -1,7 +1,7 @@
 package io.github.mybsam12138.agent.loop;
 
 import io.github.mybsam12138.agent.llm.LlmClient;
-import io.github.mybsam12138.agent.model.AgentState;
+import io.github.mybsam12138.agent.state.AgentState;
 import io.github.mybsam12138.agent.model.ToolCall;
 import io.github.mybsam12138.agent.tool.Tool;
 import io.github.mybsam12138.agent.tool.ToolRegistry;

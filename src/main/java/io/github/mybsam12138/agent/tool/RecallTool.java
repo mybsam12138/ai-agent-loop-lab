@@ -1,6 +1,6 @@
 package io.github.mybsam12138.agent.tool;
 
-import io.github.mybsam12138.agent.model.AgentState;
+import io.github.mybsam12138.agent.state.AgentState;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;

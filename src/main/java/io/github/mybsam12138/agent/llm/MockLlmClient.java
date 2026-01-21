@@ -1,8 +1,8 @@
 package io.github.mybsam12138.agent.llm;
 
-import io.github.mybsam12138.agent.model.AgentState;
+import io.github.mybsam12138.agent.state.AgentPhase;
+import io.github.mybsam12138.agent.state.AgentState;
 import io.github.mybsam12138.agent.model.ToolCall;
-import java.awt.Desktop.Action;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -11,28 +11,41 @@ public class MockLlmClient implements LlmClient {
 
     @Override
     public ToolCall decide(AgentState state) {
-        // 1. First step: print something
-        if (state.memoryHistory().isEmpty() && state.getObservation().equals("start")) {
-            return new ToolCall(
-                    "print",
-                    Map.of("message", "Starting agent with goal: " + state.getGoal())
-            );
-        }
+        switch (state.getPhase()) {
 
-        // 2. After printing, remember it
-        if (state.memoryHistory().isEmpty()) {
-            return new ToolCall(
-                    "remember",
-                    Map.of("text", state.getObservation())
-            );
-        }
+            case START:
+                state.setPhase(AgentPhase.RECALL);
+                return new ToolCall(
+                        "print",
+                        Map.of("message", "Agent started with goal: " + state.getGoal())
+                );
 
-        // 3. Recall memory once
-        if (!state.getObservation().startsWith("memory")) {
-            return new ToolCall("recall", Map.of());
-        }
+            case RECALL:
+                state.setPhase(AgentPhase.RETRIEVE);
+                return new ToolCall(
+                        "recall",
+                        Map.of("query", state.getGoal())
+                );
 
-        // 4. Finish
-        return new ToolCall("finish", Map.of());
+            case RETRIEVE:
+                state.setPhase(AgentPhase.REMEMBER);
+                return new ToolCall(
+                        "retrieve",
+                        Map.of("query", state.getGoal())
+                );
+
+            case REMEMBER:
+                state.setPhase(AgentPhase.FINISHED);
+                return new ToolCall(
+                        "remember",
+                        Map.of("text", state.getObservation())
+                );
+
+            case FINISHED:
+                return new ToolCall("finish", Map.of());
+
+            default:
+                throw new IllegalStateException("Unknown phase: " + state.getPhase());
+        }
     }
 }

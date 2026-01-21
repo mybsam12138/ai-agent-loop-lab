@@ -1,4 +1,4 @@
-package io.github.mybsam12138.agent.model;
+package io.github.mybsam12138.agent.state;
 
 import io.github.mybsam12138.agent.memory.Memory;
 import java.util.List;
@@ -12,6 +12,7 @@ public class AgentState {
     private String observation;
     private boolean finished;
     private final Memory memory;
+    private AgentPhase phase;
 
     public void remember(String entry) {
         memory.add(entry);
